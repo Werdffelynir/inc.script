@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+
+
+
+<script>
+	
+(function(window){
+
+	var Inc = function(){
+		if(!(this instanceof Inc)) return new Inc();
+	};
+
+	Inc.prototype.options = {
+		sources: [],
+		handler: {},
+		error: false,
+		current: 0
+	};
+
+	Inc.prototype.init = function(handler){
+		this.options.handler = handler;
+		this.load(this.options.sources[0]);
+	};
+
+	Inc.prototype.require = function(src){
+		this.options.sources.push(src);
+	};
+
+	Inc.prototype.load = function(src){
+
+		var self = this,
+			script = this.createScriptElement(src);
+
+		script.onload = function(event){
+			self.options.current ++;
+			if(!self.options.error && self.options.current < self.options.sources.length){
+				self.load(self.options.sources[self.options.current]);
+			}
+			if(!self.options.error && self.options.current === self.options.sources.length){
+				self.options.handler['onload'].call(script, self.options.sources);
+			}
+		};
+
+		script.onerror = function(error){
+			options.error = true;
+			self.options.handler['onerror'].call(script, error);
+		};
+
+		document.head.appendChild(script);
+	};
+
+	Inc.prototype.createScriptElement = function(url){
+		var script = document.createElement('script');
+		script.src = (url.substr(-3).toLowerCase() === '.js') ? url : url + '.js';
+		script.type = 'application/javascript';
+		return script;
+	};
+
+	window.Inc = Inc;
+
+})(window);
+
+
+
+
+
+
+
+var inc = Inc();
+
+inc.require('mods/mod1');
+inc.require('mods/mod2');
+
+var handler = {};
+handler.onload = function(result){console.log(result)};
+handler.onerror = function(error){console.log(error)};
+
+inc.init(handler);
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
