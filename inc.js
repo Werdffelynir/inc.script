@@ -2,13 +2,13 @@
 
 	var Inc = function(){
 		if(!(this instanceof Inc)) return new Inc();
-	};
-	
-	Inc.prototype.options = {
-		sources: [],
-		handler: {onload:null,onerror:null},
-		error: false,
-		current: 0
+        
+        this.options = {
+            sources: [],
+            handler: {onload:null,onerror:null},
+            error: false,
+            current: 0
+	    };
 	};
 
 	Inc.prototype.onload = null; 
@@ -26,6 +26,14 @@
 	};
 
 	Inc.prototype.load = function(src){
+        
+        if(this.scriptExists(src)) {
+            var index = this.options.sources.indexOf(src);
+            this.options.sources.splice(index,1);
+            if(this.options.sources[index+1] !== undefined)
+                return this.load(this.options.sources[index++]);
+            return;
+        };
 
 		var self = this,
 			script = this.createScriptElement(src);
@@ -49,13 +57,23 @@
 		document.head.appendChild(script);
 	};
 
-	Inc.prototype.createScriptElement = function(url){
+	Inc.prototype.createScriptElement = function(src){
 		var script = document.createElement('script');
-		script.src = (url.substr(-3).toLowerCase() === '.js') ? url : url + '.js';
+        script.setAttribute('data-inc', src);
+		script.src = (src.substr(-3).toLowerCase() === '.js') ? src : src + '.js';
 		script.type = 'application/javascript';
 		return script;
 	};
 
+	Inc.prototype.scriptExists = function(src){
+        var result = false;
+        Array.prototype.slice.call(document.scripts, 0).forEach(function(item){
+            if(!result && item.getAttribute('data-inc') === src)
+                result = true;
+        });
+        return result;
+	};
+    
 	window.Inc = Inc;
 
 })(window);
