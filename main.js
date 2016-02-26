@@ -43,12 +43,16 @@ var app = app || {
     function _constructor(){
         console.log('loading scripts success');
         
-        //console.log(app.db);
-        //console.log(app.cookie);
-        //console.log(app.worker);
+        console.log(app.db);
+
+        console.log(app.cookie);
+
+        console.log(app.worker);
         
-        app.worker.initTree(function(){
-            //console.log(app.worker);
+        app.worker.initTree(function(loadedScripts){
+
+            console.log('worker.initTree loaded', loadedScripts);
+
         });
     }
     

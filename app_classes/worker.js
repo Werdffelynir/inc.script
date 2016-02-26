@@ -18,7 +18,9 @@
         inc.require('./app_classes/db.js');
         
         //console.log(inc);
-        inc.onload = func;
+        inc.onload = function(){
+            func.call(inc,  inc.options.sources);
+        };
         inc.init();
     };
 
